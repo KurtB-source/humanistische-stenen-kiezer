@@ -12,11 +12,68 @@
 <body>
     <div id="root"></div>
     <script type="text/babel">
+        const stenenCategorieen = {
+            Respectstenen: ['Gelijkwaardigheid', 'Tolerantie', 'Empathie', 'Waardigheid', 'Diversiteit'],
+            'Ik-stenen': ['Zelfontplooiing', 'Authenticiteit', 'Zelfkennis', 'Zelfreflectie', 'Zelfvertrouwen'],
+            'Wij-stenen': ['Samenwerking', 'Solidariteit', 'Gemeenschapszin', 'Verbondenheid', 'Sociaal engagement'],
+            Vrijheidsstenen: ['Keuzevrijheid', 'Autonomie', 'Zelfbeschikking', 'Vrije meningsuiting', 'Gewetensvrijheid'],
+            Redeneerstenen: ['Kritisch denken', 'Rationaliteit', 'Logica', 'Wetenschappelijke methode', 'Objectiviteit'],
+            Verantwoordelijkheidsstenen: ['Ethisch handelen', 'Maatschappelijke betrokkenheid', 'Duurzaamheid', 'Integriteit', 'Verantwoordelijkheidsbesef']
+        };
+
         const App = () => {
+            const [gekozenStenen, setGekozenStenen] = React.useState({});
+            const [aantalGekozen, setAantalGekozen] = React.useState(0);
+
+            const toggleSteen = (categorie, steen) => {
+                setGekozenStenen(prev => {
+                    const nieuweGekozen = { ...prev };
+                    if (!nieuweGekozen[categorie]) nieuweGekozen[categorie] = [];
+                    
+                    const index = nieuweGekozen[categorie].indexOf(steen);
+                    if (index > -1) {
+                        nieuweGekozen[categorie].splice(index, 1);
+                    } else if (aantalGekozen < 25) {
+                        nieuweGekozen[categorie].push(steen);
+                    }
+                    return nieuweGekozen;
+                });
+            };
+
+            React.useEffect(() => {
+                const totaal = Object.values(gekozenStenen).flat().length;
+                setAantalGekozen(totaal);
+            }, [gekozenStenen]);
+
             return (
                 <div className="p-4">
                     <h1 className="text-2xl font-bold mb-4">Humanistische Stenen Kiezer</h1>
-                    <p className="mb-4">Welkom bij de Humanistische Stenen Kiezer. Hier komt binnenkort de interactieve inhoud!</p>
+                    <p className="mb-4">Kies maximaal 25 stenen uit de verschillende categorieën:</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                        {Object.entries(stenenCategorieen).map(([categorie, stenen]) => (
+                            <div key={categorie} className="border p-4 rounded">
+                                <h3 className="text-lg font-semibold mb-2">{categorie}</h3>
+                                {stenen.map(steen => (
+                                    <button
+                                        key={steen}
+                                        onClick={() => toggleSteen(categorie, steen)}
+                                        className={`m-1 px-2 py-1 rounded ${
+                                            gekozenStenen[categorie]?.includes(steen)
+                                                ? 'bg-blue-500 text-white'
+                                                : 'bg-gray-200'
+                                        }`}
+                                    >
+                                        {steen}
+                                    </button>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mb-4">
+                        <p>Aantal gekozen stenen: {aantalGekozen}/25</p>
+                    </div>
                 </div>
             );
         };
