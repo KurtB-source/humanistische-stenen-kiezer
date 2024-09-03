@@ -6,7 +6,6 @@
     <title>Humanistische Stenen Kiezer</title>
     <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/recharts@2.1.9/umd/Recharts.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
@@ -15,17 +14,7 @@
         const e = React.createElement;
         const useState = React.useState;
         const useEffect = React.useEffect;
-        
-        // Controleer of Recharts correct is geladen
-        if (typeof Recharts === 'undefined') {
-            console.error('Recharts is not loaded properly');
-        } else {
-            console.log('Recharts loaded successfully');
-        }
 
-        const {PieChart, Pie, Cell, Legend, ResponsiveContainer} = Recharts;
-
-        // Rest van de code blijft hetzelfde
         const stenenCategorieen = {
             Respectstenen: [
                 'Gelijkwaardigheid', 'Tolerantie', 'Empathie', 'Waardigheid', 'Diversiteit',
@@ -53,7 +42,7 @@
             ]
         };
 
-        const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+        const COLORS = ['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 'bg-purple-500', 'bg-pink-500'];
 
         function App() {
             const [gekozenStenen, setGekozenStenen] = useState({});
@@ -108,27 +97,17 @@
                 e('div', {className: 'mb-4'},
                     e('p', null, `Aantal gekozen stenen: ${aantalGekozen}/25`)
                 ),
-                aantalGekozen > 0 && Recharts ? e('div', {className: 'w-full h-96'},
-                    e(ResponsiveContainer, {width: '100%', height: '100%'},
-                        e(PieChart, null,
-                            e(Pie, {
-                                data: chartData,
-                                cx: '50%',
-                                cy: '50%',
-                                labelLine: false,
-                                outerRadius: 80,
-                                fill: '#8884d8',
-                                dataKey: 'value',
-                                label: ({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`
-                            }, 
-                                chartData.map((entry, index) => 
-                                    e(Cell, {key: `cell-${index}`, fill: COLORS[index % COLORS.length]})
-                                )
-                            ),
-                            e(Legend)
+                aantalGekozen > 0 && e('div', {className: 'w-full'},
+                    e('h2', {className: 'text-xl font-bold mb-2'}, 'Verdeling van gekozen stenen'),
+                    e('div', {className: 'space-y-2'},
+                        chartData.map((item, index) => 
+                            e('div', {key: item.name, className: 'flex items-center'},
+                                e('div', {className: `w-${item.value * 4} h-6 ${COLORS[index % COLORS.length]} mr-2`}),
+                                e('span', null, `${item.name}: ${item.value}`)
+                            )
                         )
                     )
-                ) : e('p', null, 'Grafiek kon niet worden geladen')
+                )
             );
         }
 
