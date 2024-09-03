@@ -2,19 +2,76 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>React Test zonder Babel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Humanistische Stenen Kiezer</title>
     <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
     <div id="root"></div>
     <script>
         const e = React.createElement;
+        const useState = React.useState;
+        const useEffect = React.useEffect;
+
+        const stenenCategorieen = {
+            Respectstenen: ['Gelijkwaardigheid', 'Tolerantie', 'Empathie', 'Waardigheid', 'Diversiteit'],
+            'Ik-stenen': ['Zelfontplooiing', 'Authenticiteit', 'Zelfkennis', 'Zelfreflectie', 'Zelfvertrouwen'],
+            'Wij-stenen': ['Samenwerking', 'Solidariteit', 'Gemeenschapszin', 'Verbondenheid', 'Sociaal engagement'],
+            Vrijheidsstenen: ['Keuzevrijheid', 'Autonomie', 'Zelfbeschikking', 'Vrije meningsuiting', 'Gewetensvrijheid'],
+            Redeneerstenen: ['Kritisch denken', 'Rationaliteit', 'Logica', 'Wetenschappelijke methode', 'Objectiviteit'],
+            Verantwoordelijkheidsstenen: ['Ethisch handelen', 'Maatschappelijke betrokkenheid', 'Duurzaamheid', 'Integriteit', 'Verantwoordelijkheidsbesef']
+        };
 
         function App() {
-            return e('div', {style: {padding: '20px', backgroundColor: 'lightblue'}},
-                e('h1', null, 'React werkt zonder Babel!'),
-                e('p', null, 'Als u dit ziet, is React correct geladen zonder JSX transformatie.')
+            const [gekozenStenen, setGekozenStenen] = useState({});
+            const [aantalGekozen, setAantalGekozen] = useState(0);
+
+            const toggleSteen = (categorie, steen) => {
+                setGekozenStenen(prev => {
+                    const nieuweGekozen = { ...prev };
+                    if (!nieuweGekozen[categorie]) nieuweGekozen[categorie] = [];
+                    
+                    const index = nieuweGekozen[categorie].indexOf(steen);
+                    if (index > -1) {
+                        nieuweGekozen[categorie].splice(index, 1);
+                    } else if (aantalGekozen < 25) {
+                        nieuweGekozen[categorie].push(steen);
+                    }
+                    return nieuweGekozen;
+                });
+            };
+
+            useEffect(() => {
+                const totaal = Object.values(gekozenStenen).flat().length;
+                setAantalGekozen(totaal);
+            }, [gekozenStenen]);
+
+            return e('div', {className: 'p-4'},
+                e('h1', {className: 'text-2xl font-bold mb-4'}, 'Humanistische Stenen Kiezer'),
+                e('p', {className: 'mb-4'}, 'Kies maximaal 25 stenen uit de verschillende categorieën:'),
+                e('div', {className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8'},
+                    Object.entries(stenenCategorieen).map(([categorie, stenen]) => 
+                        e('div', {key: categorie, className: 'border p-4 rounded'},
+                            e('h3', {className: 'text-lg font-semibold mb-2'}, categorie),
+                            stenen.map(steen => 
+                                e('button', {
+                                    key: steen,
+                                    onClick: () => toggleSteen(categorie, steen),
+                                    className: `m-1 px-2 py-1 rounded ${
+                                        gekozenStenen[categorie]?.includes(steen)
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-gray-200'
+                                    }`
+                                }, steen)
+                            )
+                        )
+                    )
+                ),
+                e('div', {className: 'mb-4'},
+                    e('p', null, `Aantal gekozen stenen: ${aantalGekozen}/25`)
+                )
             );
         }
 
